@@ -8,15 +8,21 @@
 
 #include "libmseed.h"
 
-#include "min_max.h"
-#include "standard_deviation.h"
-
 static void
 usage ()
 {
   printf ("Usage: ./ms2ampmax <mseedfile>\n");
   printf ("\nOutput format: \n");
-  printf ("<maximum> <maximum with demean>\n");
+  printf ("an image of spectogram\n");
+}
+
+static void dumpdata(double* data, uint64_t totalSamples, FILE *fptr)
+{
+  uint64_t i;
+  for(i = 0; i < totalSamples; i++)
+  {
+    fprintf(fptr, "%lf ", data[i]);
+  }
 }
 
 int
@@ -29,6 +35,16 @@ main (int argc, char **argv)
   uint32_t flags     = 0;
   int8_t verbose     = 0;
   int rv;
+
+#ifdef DUMPDATA
+  FILE *fptr;
+  fptr = fopen("dumpdata.txt", "w");
+  if(fptr == NULL)
+  {
+    printf("Error!");
+    return -1;
+  }
+#endif
 
   /* Simple argument parsing */
   if (argc != 2)
@@ -135,6 +151,11 @@ main (int argc, char **argv)
     }
 
     /* FFT and print */ 
+    
+
+#ifdef DUMPDATA
+    dumpdata(data, totalSamples, fptr);
+#endif
 
     free(data);
     tid = tid->next;
@@ -143,5 +164,8 @@ main (int argc, char **argv)
   /* Make sure everything is cleaned up */
   if (mstl)
       mstl3_free (&mstl, 0);
+#ifdef DUMPDATA
+    fclose(fptr);
+#endif
   return 0;
 }
