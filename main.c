@@ -134,15 +134,7 @@ main (int argc, char **argv)
       seg = seg->next;
     }
 
-    /* Calculate the min, max, and maxamp with all and demean */
-    double mean, SD;
-    getMeanAndSD (data, totalSamples, &mean, &SD);
-    double min, max, minDemean, maxDemean, maxamp, maxampDemean;
-    getMinMaxAndDemean (data, totalSamples, &min, &max,
-                        &minDemean, &maxDemean, mean);
-    maxamp       = (fabs (max) > fabs (min)) ? fabs (max) : fabs (min);
-    maxampDemean = (fabs (maxDemean) > fabs (minDemean)) ? fabs (maxDemean) : fabs (minDemean);
-    printf ("%.5E %.5E\n", maxamp, maxampDemean);
+    /* FFT and print */ 
 
     free(data);
     tid = tid->next;
