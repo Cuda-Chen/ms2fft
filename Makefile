@@ -1,14 +1,14 @@
 DEBUG = 0
-DUMPDATA = 1
+DUMPDATA = 0
 
 CC = gcc
 EXEC = ms2fft
 COMMON = -I./libmseed/ -I.
 CFLAGS =  -Wall
 LDFLAGS = -L./libmseed -Wl,-rpath,./libmseed
-LDLIBS = -Wl,-Bstatic -lmseed -Wl,-Bdynamic -lm
+LDLIBS = -Wl,-Bstatic -lmseed -Wl,-Bdynamic -lm -lfftw3
 
-OBJS = main.o
+OBJS = main.o standard_deviation.o
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -O0 -g -DDEBUG=1
