@@ -9,6 +9,7 @@
 #include "fftw3.h"
 #include "libmseed.h"
 
+#include "fft.h"
 #include "standard_deviation.h"
 
 static void
@@ -53,6 +54,12 @@ main (int argc, char **argv)
     return -1;
   }
 #endif
+  FILE *output = fopen ("fftoutput.csv", "w");
+  if (output == NULL)
+  {
+    printf ("Error opening!");
+    return -1;
+  }
 
   /* Simple argument parsing */
   if (argc != 2)
@@ -165,8 +172,7 @@ main (int argc, char **argv)
 #ifdef DUMPDATA
     dumpdata (data, totalSamples, fptr);
 #endif
-    fftw_complex *in, *out, *ref;
-    testFFT (data, in, out, ref, totalSamples);
+    fftToFile (data, totalSamples, output);
 
     free (data);
     tid = tid->next;
@@ -178,6 +184,7 @@ main (int argc, char **argv)
 #ifdef DUMPDATA
   fclose (fptr);
 #endif
+  fclose (output);
   return 0;
 }
 
