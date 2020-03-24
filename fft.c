@@ -42,7 +42,7 @@ fftToFile (double *data, uint64_t dataSamples, FILE *fptr)
   {
     printf ("recover: %" PRId64 " %+9.5f %+9.5f I v.s. %+9.5f %+9.5f I\n",
             i, in[i][0], in[i][1], ref[i][0], ref[i][1]);
-    fprintf (fptr, "%lf,%lf\r\n", out[i][0], out[i][1]);
+    fprintf (fptr, "%lf %lf\n", out[i][0], out[i][1]);
   }
   fftw_destroy_plan (ifft);
 }

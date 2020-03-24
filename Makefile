@@ -1,5 +1,5 @@
 DEBUG = 0
-DUMPDATA = 0
+DUMPDATA = 1
 
 CC = gcc
 EXEC = ms2fft

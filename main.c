@@ -26,7 +26,7 @@ dumpdata (double *data, uint64_t totalSamples, FILE *fptr)
   uint64_t i;
   for (i = 0; i < totalSamples; i++)
   {
-    fprintf (fptr, "%lf ", data[i]);
+    fprintf (fptr, "%lf\n", data[i]);
   }
 }
 
@@ -54,7 +54,7 @@ main (int argc, char **argv)
     return -1;
   }
 #endif
-  FILE *output = fopen ("fftoutput.csv", "w");
+  FILE *output = fopen ("fftoutput.txt", "w");
   if (output == NULL)
   {
     printf ("Error opening!");
