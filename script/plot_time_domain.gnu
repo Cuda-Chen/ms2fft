@@ -1,4 +1,4 @@
-set terminal png
+#set terminal png
 set title "Time Domain"
 set ylabel "Amplitude"
 set xlabel "Time [s]"

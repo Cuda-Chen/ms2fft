@@ -41,8 +41,9 @@ main (int argc, char **argv)
   MS3TraceList *mstl = NULL;
   MS3TraceID *tid    = NULL;
   MS3TraceSeg *seg   = NULL;
-  uint32_t flags     = 0;
-  int8_t verbose     = 0;
+  double sampleRate;
+  uint32_t flags = 0;
+  int8_t verbose = 0;
   int rv;
 
 #ifdef DUMPDATA
@@ -111,6 +112,9 @@ main (int argc, char **argv)
     }
     while (seg)
     {
+      /* Get sampling rate */
+      sampleRate = seg->samprate;
+
       /* Unpack and get the data */
       if (seg->recordlist && seg->recordlist->first)
       {
@@ -172,7 +176,7 @@ main (int argc, char **argv)
 #ifdef DUMPDATA
     dumpdata (data, totalSamples, fptr);
 #endif
-    fftToFile (data, totalSamples, output);
+    fftToFile (data, totalSamples, sampleRate, output);
 
     free (data);
     tid = tid->next;
