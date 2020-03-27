@@ -1,3 +1,5 @@
+# test script, DO NOT USE IT!
+
 inputfile = 'fftoutput.txt'
 
 set title "Frequency Domain"
@@ -6,5 +8,8 @@ set xlabel "Frequency [Hz]"
 
 stats inputfile
 
+set xrange[0:50]
+
 plot \
-[:STATS_records/2]inputfile using :(abs($2)/60001)
+inputfile using ($1):(abs($2)/STATS_records)
+#[:STATS_records/2]inputfile using ($1):(abs($2)/60001)

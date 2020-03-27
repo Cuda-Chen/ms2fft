@@ -31,8 +31,7 @@ dumpdata (double *data, uint64_t totalSamples, FILE *fptr)
 }
 
 static void demean (double *data, uint64_t totalSamples, double demean);
-static void testFFT (double *data, fftw_complex *in, fftw_complex *out,
-                     fftw_complex *ref, uint64_t totalSamples);
+static void plotFrequencyResponse (const char *inputfile, double maxFrequency);
 
 int
 main (int argc, char **argv)
@@ -46,6 +45,8 @@ main (int argc, char **argv)
   int8_t verbose = 0;
   int rv;
 
+  const char *fftoutputFile = "fftoutput.txt";
+
 #ifdef DUMPDATA
   FILE *fptr;
   fptr = fopen ("dumpdata.txt", "w");
@@ -55,7 +56,7 @@ main (int argc, char **argv)
     return -1;
   }
 #endif
-  FILE *output = fopen ("fftoutput.txt", "w");
+  FILE *output = fopen (fftoutputFile, "w");
   if (output == NULL)
   {
     printf ("Error opening!");
@@ -178,6 +179,8 @@ main (int argc, char **argv)
 #endif
     fftToFile (data, totalSamples, sampleRate, output);
 
+    plotFrequencyResponse (fftoutputFile, sampleRate / 2.);
+
     free (data);
     tid = tid->next;
   }
@@ -202,46 +205,27 @@ demean (double *data, uint64_t totalSamples, double mean)
   }
 }
 
+/* Plot Frequency Response using `gnuplot` */
 static void
-testFFT (double *data, fftw_complex *in, fftw_complex *out,
-         fftw_complex *ref, uint64_t totalSamples)
+plotFrequencyResponse (const char *inputfile, double maxFrequency)
 {
-  fftw_plan fft, ifft;
-  uint64_t i;
-  /* allocate memory */
-  in  = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * totalSamples);
-  out = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * totalSamples);
-  ref = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * totalSamples);
+  char config[] =
+      "set title 'Frequency Domain'\n"
+      "set ylabel 'Amplitude'\n"
+      "set xlabel 'Frequency [Hz]'\n";
 
-  /* prepare input data */
-  for (i = 0; i < totalSamples; i++)
-  {
-    in[i][0] = data[i];
-    in[i][1] = 0;
-  }
+  /* Set title, xlabel, and ylabel */
+  FILE *plot;
+  plot = popen ("gnuplot -p", "w");
+  fprintf (plot, config);
 
-  /* Fourier transform and save result to `out` */
-  fft = fftw_plan_dft_1d (totalSamples, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-  fftw_execute (fft);
-  fftw_destroy_plan (fft);
+  /* Read inputfile (fftoutput.txt) and plot half of the sample points */
+  fprintf (plot, "inputfile = '%s'\n", inputfile);
+  fprintf (plot, "stats inputfile nooutput\n");
+  fprintf (plot, "set xrange[:%lf]\n", maxFrequency);
 
-  /* inverse Fourier transform and save result to `ref` */
-  printf ("\ninverse transform:\n");
-  ifft = fftw_plan_dft_1d (totalSamples, out, ref, FFTW_BACKWARD, FFTW_ESTIMATE);
-  fftw_execute (ifft);
-  /* normalize */
-  for (i = 0; i < totalSamples; i++)
-  {
-    ref[i][0] *= 1. / totalSamples;
-    ref[i][1] *= 1. / totalSamples;
-  }
-  for (i = 0; i < totalSamples; i++)
-  {
-    printf ("recover: %" PRId64 " %+9.5f %+9.5f I v.s. %+9.5f %+9.5f I\n",
-            i, in[i][0], in[i][1], ref[i][0], ref[i][1]);
-  }
-  fftw_destroy_plan (ifft);
+  fprintf (plot, "plot \
+            inputfile using ($1):(abs($2)/STATS_records)\n");
 
-  /* cleanup plan */
-  fftw_cleanup ();
+  pclose (plot);
 }
