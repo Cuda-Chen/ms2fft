@@ -177,9 +177,9 @@ main (int argc, char **argv)
 #ifdef DUMPDATA
     dumpdata (data, totalSamples, fptr);
 #endif
-    fftToFile (data, totalSamples, sampleRate, output);
+    fftToFileHalf (data, totalSamples, sampleRate, output);
 
-    plotFrequencyResponse (fftoutputFile, sampleRate / 2.);
+    //plotFrequencyResponse (fftoutputFile, sampleRate / 2.);
 
     free (data);
     tid = tid->next;
