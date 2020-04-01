@@ -1,19 +1,39 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "fftw3.h"
 
 #include "fft.h"
+
+/*
+ * Create an array of evenly spaced numbers.
+ * Input: malloced array `array`, min, max, n
+ * Output: array `array` filled with values
+ * Reference: https://gist.github.com/mortenpi/f20a93c8ed3ee7785e65
+ */
+static void
+range (double *array, double min, double max, size_t n)
+{
+  double delta = (max - min) / (double)(n - 1);
+  size_t i;
+  for (i = 0; i < n; i++)
+  {
+    array[i] = min + i * delta;
+  }
+}
 
 void
 fftToFileHalf (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr)
 {
   fftw_plan fft;
   uint64_t i;
+  double min = 0.0, max = sampleRate;
   /* allocate memory */
   fftw_complex *in  = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
   fftw_complex *out = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
+  double *freq      = (double *)malloc (sizeof (double) * dataSamples);
 
   /* prepare input data */
   for (i = 0; i < dataSamples; i++)
@@ -22,15 +42,22 @@ fftToFileHalf (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr
     in[i][1] = 0;
   }
 
+  /* prepare frequency index and data */
+  range (freq, min, max, dataSamples);
+
   /* Fourier transform and save result to `out` */
   fft = fftw_plan_dft_1d (dataSamples, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute (fft);
   fftw_destroy_plan (fft);
-
   for (i = 0; i < dataSamples / 2; i++)
   {
-    fprintf (fptr, "%lf %lf %lf\n", ((double)i / dataSamples * sampleRate), out[i][0], out[i][1]);
+    fprintf (fptr, "%lf %lf %lf\n", freq[i], out[i][0], out[i][1]);
   }
+
+  /* free allocated memory */
+  fftw_free (in);
+  fftw_free (out);
+  free (freq);
 }
 
 void
@@ -38,9 +65,11 @@ fftToFile (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr)
 {
   fftw_plan fft;
   uint64_t i;
+  double min = 0, max = sampleRate;
   /* allocate memory */
   fftw_complex *in  = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
   fftw_complex *out = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
+  double *freq      = (double *)malloc (sizeof (double) * dataSamples);
 
   /* prepare input data */
   for (i = 0; i < dataSamples; i++)
@@ -49,6 +78,9 @@ fftToFile (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr)
     in[i][1] = 0;
   }
 
+  /* prepare frequency index and data */
+  range (freq, min, max, dataSamples);
+
   /* Fourier transform and save result to `out` */
   fft = fftw_plan_dft_1d (dataSamples, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute (fft);
@@ -56,8 +88,13 @@ fftToFile (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr)
 
   for (i = 0; i < dataSamples; i++)
   {
-    fprintf (fptr, "%lf %lf %lf\n", ((double)i / dataSamples * sampleRate), out[i][0], out[i][1]);
+    fprintf (fptr, "%lf %lf %lf\n", freq[i], out[i][0], out[i][1]);
   }
+
+  /* free allocated memory */
+  fftw_free (in);
+  fftw_free (out);
+  free (freq);
 }
 
 /* Usage: Unit test function of FFT utility.
