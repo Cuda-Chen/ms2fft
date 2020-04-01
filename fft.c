@@ -30,6 +30,7 @@ fftToFileHalf (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr
   fftw_plan fft;
   uint64_t i;
   double min = 0.0, max = sampleRate;
+  uint64_t mid = (dataSamples % 2 == 0) ? (dataSamples / 2) : (dataSamples / 2 + 1);
   /* allocate memory */
   fftw_complex *in  = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
   fftw_complex *out = (fftw_complex *)fftw_malloc (sizeof (fftw_complex) * dataSamples);
@@ -49,7 +50,7 @@ fftToFileHalf (double *data, uint64_t dataSamples, double sampleRate, FILE *fptr
   fft = fftw_plan_dft_1d (dataSamples, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
   fftw_execute (fft);
   fftw_destroy_plan (fft);
-  for (i = 0; i < dataSamples / 2; i++)
+  for (i = 0; i < mid; i++)
   {
     fprintf (fptr, "%lf %lf %lf\n", freq[i], out[i][0], out[i][1]);
   }
