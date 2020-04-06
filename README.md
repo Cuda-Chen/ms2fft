@@ -17,6 +17,11 @@ $ make
 $ ./ms2fft
 ```
 
+# Output Format
+```
+<fs> <real> <imag>
+```
+
 # What is the meaning of out[0]?
 - http://www.fftw.org/fftw3_doc/Complex-One_002dDimensional-DFTs.html#Complex-One_002dDimensional-DFTs
     - The DFT results are stored in-order in the array out, with the zero-frequency (DC) component in out[0]. 
