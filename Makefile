@@ -3,10 +3,13 @@ DUMPDATA = 1
 
 CC = gcc
 EXEC = ms2fft
-COMMON = -I./libmseed/ -I.
+#COMMON = -I./libmseed/ -I.
+COMMON = -I/usr/local -I.
 CFLAGS =  -Wall
-LDFLAGS = -L./libmseed -Wl,-rpath,./libmseed
-LDLIBS = -Wl,-Bstatic -lmseed -Wl,-Bdynamic -lm -lfftw3
+#LDFLAGS = -L./libmseed -Wl,-rpath,./libmseed
+#LDLIBS = -Wl,-Bstatic -lmseed -Wl,-Bdynamic -lm -lfftw3
+LDFLAGS = -L/usr/local
+LDLIBS = -lmseed -lm -lfftw3
 
 OBJS = main.o standard_deviation.o fft.o
 
@@ -23,12 +26,12 @@ endif
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(MAKE) -C libmseed/ static
+	#$(MAKE) -C libmseed/ static
 	$(CC) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 %.o: %.c
 	$(CC) $(COMMON) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(MAKE) -C libmseed/ clean
+	#$(MAKE) -C libmseed/ clean
 	rm -rf $(OBJS) $(EXEC)
