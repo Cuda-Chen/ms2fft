@@ -16,8 +16,10 @@ static void
 usage ()
 {
   printf ("Usage: ./ms2ampmax <mseedfile>\n");
+  printf ("## Options ##\n"
+          " mseedfile       input miniSEED file\n");
   printf ("\nOutput format: \n");
-  printf ("an image of spectogram\n");
+  printf ("<fs> <real> <imag>\n");
 }
 
 static void

@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 
 def fft_and_print_result(inputfile, freq):
     s = np.loadtxt(inputfile)
-    t = np.linspace(0, s.size / freq, s.size);
+    start = 20000
+    end = 40000
+    s = s[start:end]
+    n = end - start
+    t = np.linspace(0, n / freq, n);
 
     # plot time domain figure
     plt.ylabel("Amplitude")
@@ -20,7 +24,7 @@ def fft_and_print_result(inputfile, freq):
         print("Value at index {}:\t{}".format(i, fft[i + 1]), "\nValue at index {}:\t{}".format(fft.size -1 - i, fft[-1 - i]))
 
     T = t[1] - t[0]
-    N = s.size
+    N = n
 
     # 1 / T = frequency
     f = np.linspace(0, 1 / T, N)

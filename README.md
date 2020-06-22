@@ -14,7 +14,7 @@ $ git clone --recursive https://github.com/Cuda-Chen/ms2fft.git
 Then type:
 ```
 $ make
-$ ./ms2fft
+$ ./ms2fft [mseedfile]
 ```
 
 # Output Format
